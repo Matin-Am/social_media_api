@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+load_dotenv() # Loads the config from .env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -79,10 +82,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'social_media',
-        'USER':'postgres',
-        'PASSWORD':'postgres',
+        'USER':str(os.getenv("USER_POSTGRESQL")),
+        'PASSWORD':str(os.getenv("PASSWORD_POSTGRESQL")),
         'PORT':'5432',
-        'HOST':'localhost'
+        'HOST':str(os.getenv("localhost"))
     }
 }
 
