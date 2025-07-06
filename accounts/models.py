@@ -9,13 +9,13 @@ from django.contrib.auth.models import AbstractUser , AbstractBaseUser
 class User(AbstractBaseUser):
     phone_number = models.CharField(max_length=11 , unique=True , verbose_name="Phone number")
     email = models.EmailField(max_length=100,unique=True,verbose_name="Email adress")
-    date_joined = models.DateTimeField(auto_now_add=True)
+    date_joined = models.DateTimeField(auto_now=True)
     is_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
     objects = UserManager()
 
-    REQUIRED_FIELDS = ['phone_number',"email"]
+    REQUIRED_FIELDS = ["email",]
     USERNAME_FIELD = "phone_number"
 
 
