@@ -1,4 +1,5 @@
 from django.db import models
+from . managers import UserManager
 from django.contrib.auth.models import AbstractUser , AbstractBaseUser
 # Create your models here.
 
@@ -12,6 +13,7 @@ class User(AbstractBaseUser):
     is_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
+    objects = UserManager()
 
     REQUIRED_FIELDS = ['phone_number',"email"]
     USERNAME_FIELD = "phone_number"
