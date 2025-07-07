@@ -39,3 +39,9 @@ class OtpCode(models.Model):
     code = models.SmallIntegerField()
     email = models.EmailField(max_length=100)
     created = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.email} - {self.code}"
+
+    class Meta:
+        ordering = ("-created",)
