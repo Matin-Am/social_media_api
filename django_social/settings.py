@@ -85,11 +85,7 @@ DATABASES = {
         'USER':str(os.getenv("USER_POSTGRESQL")),
         'PASSWORD':str(os.getenv("PASSWORD_POSTGRESQL")),
         'PORT':'5432',
-<<<<<<< HEAD
-        'HOST':str(os.getenv("localhost"))
-=======
         'HOST':str(os.getenv("HOST_POSTGRESQL"))
->>>>>>> second
     }
 }
 

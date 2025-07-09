@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import UserRegistrationSerializer
 from .models import User , OtpCode
-from utils import send_otp_code
+from django_social.utils import send_otp_code
 from .sessions import Data
 import random
 # Create your views here.
@@ -22,4 +22,4 @@ class UserRegistrationAPI(APIView):
             OtpCode.objects.create(code=random_code,email=cd["email"])
             return Response({"Message":"We sent you a code , please check your email"},status=status.HTTP_200_OK)
         return Response(ser_data.errors,status=status.HTTP_400_BAD_REQUEST)
-    
+
