@@ -1,8 +1,9 @@
 from django.db import models
 from . managers import UserManager
 from django.contrib.auth.models import AbstractUser , AbstractBaseUser
+from django.utils import timezone
+from datetime import timedelta
 # Create your models here.
-
 
 
 
@@ -42,6 +43,10 @@ class OtpCode(models.Model):
 
     def __str__(self):
         return f"{self.email} - {self.code}"
+
+    def is_expired(self):
+        return (timezone.now() - self.created) > timedelta(minutes=3)
+
 
     class Meta:
         ordering = ("-created",)
