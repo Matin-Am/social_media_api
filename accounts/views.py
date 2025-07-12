@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import UserRegistrationSerializer , VerifyCodeSerializer
 from .models import User , OtpCode
-from ..utils import send_otp_code
+from utils  import send_otp_code
 from .sessions import Data
 import random
 # Create your views here.

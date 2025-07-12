@@ -3,6 +3,7 @@ from . managers import UserManager
 from django.contrib.auth.models import AbstractUser , AbstractBaseUser
 from django.utils import timezone
 from datetime import timedelta
+from django.core.validators import MaxValueValidator , MinValueValidator
 # Create your models here.
 
 
@@ -37,7 +38,7 @@ class User(AbstractBaseUser):
 
 
 class OtpCode(models.Model):
-    code = models.SmallIntegerField()
+    code = models.SmallIntegerField(validators=[MinValueValidator(1000),MaxValueValidator(9999)])
     email = models.EmailField(max_length=100)
     created = models.DateTimeField(auto_now=True)
 

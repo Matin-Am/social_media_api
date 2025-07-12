@@ -1,7 +1,6 @@
 from rest_framework import serializers
-from django.core.exceptions import ValidationError
 from .models import  OtpCode
-
+from django.contrib.auth import get_user_model
 
 class UserRegistrationSerializer(serializers.Serializer):
     phone_number = serializers.CharField(required=True,label='Phone Number')
@@ -14,8 +13,24 @@ class UserRegistrationSerializer(serializers.Serializer):
         p1 = data["password"]
         p2 = data["confirm_password"]
         if p1 and p2 and p1 != p2 :
-            raise ValidationError("Passwords must match ! ")
+            raise serializers.ValidationError("Passwords must match ! ")
         return data
+        
+    def validate_phone_number(self,value):
+        phone_number = get_user_model().objects.filter(phone_number=value)
+        if phone_number.exists():
+            raise serializers.ValidationError("This phone number already exists ! ")
+        return value
+    
+    def validate_email(self,value):
+        email = get_user_model().objects.filter(email=value)
+        if email.exists():
+            raise serializers.ValidationError("This email already exists ! ")
+        return value
+
+
+
+
 
 class VerifyCodeSerializer(serializers.ModelSerializer):
     class Meta:

@@ -3,6 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .forms import UserChangeForm,  UserCreationForm
 from django.contrib.auth.models import Group
 from .models import User , OtpCode
+from rest_framework.authtoken.models import Token
 # Register your models here.
 
 
