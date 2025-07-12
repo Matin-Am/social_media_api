@@ -2,40 +2,64 @@ services:
   backend: 
     image: social-media-app 
     build: . 
-    container_name: social_django
-    command: python manage.py runserver 0.0.0.0:8000
+    container_name: django_social
+    command: sh -c "python manage.py makemigrations && 
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
     ports:
-      - 8000:8000
+      - "8000:8000"
+    restart: always 
     volumes:
       - ./django_social:/app 
     env_file: 
       - .env  
     depends_on:
       - db
+    networks:
+      - main
   db:
     image: postgres:15
-    container_name: postgres_db 
+    container_name: postgresql_social 
     restart: always 
     environment:
       POSTGRES_DB: social_media
       POSTGRES_USER: ${USER_POSTGRESQL}
       POSTGRES_PASSWORD: ${PASSWORD_POSTGRESQL} 
     ports:
-      - 5432:5432
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+    networks:
+      - main
   rabbitmq: 
     image: rabbitmq:3-management
-    container_name: rabbitmq
-    environment:
-      - RABBITMQ_DEFAULT_USER=matin
-      - RABBITMQ_DEFAULT_PASSWORD=matin
-      - RABBITMQ_DEFAULT_VHOST=matin_vhost
+    restart: always 
+    container_name: rabbitmq_social
     ports:
-      - 5672:5672
-      - 15672:15672
+      - "5674:5672"
+      - "15674:15672"
+    networks:
+      - main
 
+  celery_worker: 
+    build: .
+    container_name: celery_social
+    restart: always 
+    command: celery -A django_social worker -l INFO
+    volumes:
+      - ./django_social:/app
+    env_file: 
+      - .env  
+    depends_on:
+      - backend
+      - rabbitmq
+      - db 
+    environment:
+      - CELERY_FORCE_ROOT="true"
+    networks:
+      - main
 
 volumes:
   postgres_data:
+networks:
+  main:
