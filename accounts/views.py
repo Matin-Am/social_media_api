@@ -4,11 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import UserRegistrationSerializer , VerifyCodeSerializer
 from .models import User , OtpCode
-<<<<<<< HEAD
-from django_social.utils import send_otp_code
-=======
 from utils  import send_otp_code
->>>>>>> second
 from .sessions import Data
 import random
 # Create your views here.
@@ -27,8 +23,6 @@ class UserRegistrationAPI(APIView):
             return Response({"Message":"We sent you a code , please check your email"},status=status.HTTP_200_OK)
         return Response(ser_data.errors,status=status.HTTP_400_BAD_REQUEST)
 
-<<<<<<< HEAD
-=======
 class UserVerifyCodeAPI(APIView):
     serializer_class = VerifyCodeSerializer
     def post(self,request):
@@ -60,4 +54,3 @@ class UserLogoutAPI(APIView):
         request.user.auth_token.delete()
         return Response({"message":"Logged out successfully"},status=status.HTTP_200_OK)
     
->>>>>>> second
