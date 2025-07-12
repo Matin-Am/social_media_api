@@ -137,11 +137,20 @@ AUTH_USER_MODEL = "accounts.User"
 
 # SMTP EMAIL 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST_USER = "matin.amani101013@gmail.com"
-EMAIL_HOST_PASSWORD = "misxodwnmyulytxu"
+EMAIL_HOST_USER = str(os.getenv("EMAIL_USER"))
+EMAIL_HOST_PASSWORD = str(os.getenv("EMAIL_PASSWORD"))
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+# Session Management 
+SESSION_COOKIE_AGE = 1800 #seconds 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+
+
+
+
 
 #REST Authentication 
 REST_FRAMEWORK = {
