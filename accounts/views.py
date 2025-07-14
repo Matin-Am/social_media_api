@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
 from .serializers import UserRegistrationSerializer , VerifyCodeSerializer
 from .models import User , OtpCode
 from utils  import send_otp_code
@@ -50,6 +51,7 @@ class UserVerifyCodeAPI(APIView):
         return Response(ser_data.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class UserLogoutAPI(APIView):
+    authentication_classes = [TokenAuthentication,]
     def get(self,request,format=None):
         request.user.auth_token.delete()
         return Response({"message":"Logged out successfully"},status=status.HTTP_200_OK)
