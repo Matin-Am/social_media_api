@@ -152,9 +152,3 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 
 
-#REST Authentication 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ]
-}

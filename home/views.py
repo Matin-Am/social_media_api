@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from .serializers import PostSerializer
+from .custome_permissions import AdminOrIsowneronlyPermission
 from .models import Post
 # Create your views here.
 
@@ -26,6 +27,7 @@ class UserCreatePostAPI(APIView):
         return Response(ser_data.errors,status=status.HTTP_400_BAD_REQUEST)
 
 class UserUpdatePostAPI(APIView):
+    authentication_classes = [TokenAuthentication,]
     serializer_class = PostSerializer
     def put(self,request,post_id):
         post = Post.objects.get(pk=post_id)
@@ -36,7 +38,10 @@ class UserUpdatePostAPI(APIView):
         return Response(ser_data.errors,status=status.HTTP_400_BAD_REQUEST)
     
 class UserDeletePostAPI(APIView):
+    authentication_classes = [TokenAuthentication,]
+    permission_classes = [AdminOrIsowneronlyPermission,]
     def delete(self,request,post_id):
         post = get_object_or_404(Post , id = post_id)
+        self.check_object_permissions(request , post)
         post.delete()
         return Response({"message":"post has been deleted successfully"},status=status.HTTP_200_OK)
