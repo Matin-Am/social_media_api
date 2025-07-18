@@ -16,7 +16,7 @@ class Post(models.Model):
     user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE, related_name="posts")
     body = models.TextField(max_length=400)
     description = models.TextField(max_length=100)
-    file = models.FileField(upload_to="uploads/",validators=[validate_file_extentions,])
+    file = models.FileField(upload_to="posts/",validators=[validate_file_extentions,])
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(auto_now_add=True)
 
