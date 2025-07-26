@@ -160,7 +160,10 @@ STORAGES = {
           "bucket_name":str(os.getenv("ARVAN_BUCKET_NAME"))
         },
     },
-    "staticfiles":"django.contrib.staticfiles.storage.StaticFilesStorage"
+   "staticfiles": {
+    "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
+}
+
 }
 
 

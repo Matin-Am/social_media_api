@@ -51,3 +51,13 @@ class OtpCode(models.Model):
 
     class Meta:
         ordering = ("-created",)
+
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User , on_delete=models.CASCADE)
+    age = models.SmallIntegerField(validators=[MinValueValidator(1),  MaxValueValidator(99)])
+    bio = models.TextField(null=True , blank=True)
+
+    def __str__(self):
+        return f"{self.user} - {self.age} Years Old"
