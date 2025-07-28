@@ -14,6 +14,7 @@ def validate_file_extentions(value):
 
 class Post(models.Model):
     user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE, related_name="posts")
+    slug = models.SlugField(null=True,blank=True)
     body = models.TextField(max_length=400)
     description = models.TextField(max_length=100)
     file = models.FileField(upload_to="posts/",validators=[validate_file_extentions,])

@@ -4,7 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from .serializers import PostSerializer
-from .custome_permissions import AdminOrIsowneronlyPermission
+from .custome_permissions import AdminOrIsowneronlyPermission 
+from rest_framework.permissions import IsAuthenticated
 from .models import Post
 # Create your views here.
 
@@ -28,9 +29,11 @@ class UserCreatePostAPI(APIView):
 
 class UserUpdatePostAPI(APIView):
     authentication_classes = [TokenAuthentication,]
+    permission_classes = [AdminOrIsowneronlyPermission]
     serializer_class = PostSerializer
     def put(self,request,post_id):
         post = Post.objects.get(pk=post_id)
+        self.check_object_permissions(request,post)
         ser_data =  self.serializer_class(data=request.data, instance=post,partial=True)
         if ser_data.is_valid():
             post = ser_data.save()  
