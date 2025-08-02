@@ -7,5 +7,6 @@ urlpatterns  = [
     path("update/<int:post_id>/",views.UserUpdatePostAPI.as_view()),
     path("list/",views.UserListPostsAPI.as_view()), 
     path("delete/<int:post_id>/",views.UserDeletePostAPI.as_view()) , 
-    path("follow/<int:user_id>/",views.UserFollowAPI.as_view())
+    path("follow/<int:user_id>/",views.UserFollowAPI.as_view()),
+    path("unfollow/<int:user_id>/",views.UserUnfollowAPI.as_view())
 ]

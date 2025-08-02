@@ -20,7 +20,6 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = ["email",]
     USERNAME_FIELD = "phone_number"
 
-
     def __str__(self):
         return self.email
     
@@ -51,7 +50,7 @@ class OtpCode(models.Model):
 
     class Meta:
         ordering = ("-created",)
-
+        db_table = "otpcode"
 
 
 class Profile(models.Model):
@@ -59,5 +58,8 @@ class Profile(models.Model):
     age = models.SmallIntegerField(validators=[MinValueValidator(1),  MaxValueValidator(99)])
     bio = models.TextField(null=True , blank=True)
 
+    class Meta:
+        db_table = "profile"
+    
     def __str__(self):
         return f"{self.user} - {self.age} Years Old"

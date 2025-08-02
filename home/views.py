@@ -63,3 +63,15 @@ class UserFollowAPI(APIView):
             return Response({"message":"You already followed this user"},status=status.HTTP_400_BAD_REQUEST)
         return Response({"message":"You followed this user"},status=status.HTTP_200_OK)
     
+class UserUnfollowAPI(APIView):
+    def delete(self,request,user_id):
+        user = get_object_or_404(User,id=user_id)
+        relation = Relation.objects.filter(from_user=request.user , to_user=user)
+        if relation.exists():
+            relation.delete()
+            return Response({"Message":"User unfollowed successfully"},status=status.HTTP_200_OK)
+        return Response({"Error":"You are already not following this user"},status=status.HTTP_400_BAD_REQUEST)
+    
+class UserListRelationAPI(APIView):
+    def get(self,request):
+        pass
