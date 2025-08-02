@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Post
-
+from django.utils.text import slugify
 
 class PostSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField(read_only=True)
@@ -21,6 +21,7 @@ class PostSerializer(serializers.ModelSerializer):
        post = Post.objects.create(
            user = request.user , 
            body = validated_data.get("body"),
+           slug = slugify(validated_data.get("body")[:30]),
            description = validated_data.get("description") ,
            file = validated_data.get("file")
        )
@@ -28,6 +29,7 @@ class PostSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
             instance.body = validated_data.get("body",instance.body)
+            instance.slug = slugify(validated_data.get("body")[:30])
             instance.description = validated_data.get("description",instance.description)
             instance.file = validated_data.get("file",instance.file)
             instance.save()

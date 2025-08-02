@@ -6,6 +6,7 @@ from rest_framework.authentication import TokenAuthentication
 from .serializers import UserRegistrationSerializer , VerifyCodeSerializer
 from .models import User , OtpCode
 from utils  import send_otp_code
+from .tasks import send_otp
 from .sessions import Data
 import random
 # Create your views here.
@@ -19,7 +20,7 @@ class UserRegistrationAPI(APIView):
             data = Data(request,cd["phone_number"],cd["email"])
             data.save_data(cd["password"])
             random_code = random.randint(1111,9999)
-            send_otp_code(cd["email"],random_code)
+            send_otp.apply_async(args=[cd["email"],random_code])
             OtpCode.objects.create(code=random_code,email=cd["email"])
             return Response({"Message":"We sent you a code , please check your email"},status=status.HTTP_200_OK)
         return Response(ser_data.errors,status=status.HTTP_400_BAD_REQUEST)
@@ -54,5 +55,9 @@ class UserLogoutAPI(APIView):
     authentication_classes = [TokenAuthentication,]
     def get(self,request,format=None):
         request.user.auth_token.delete()
+<<<<<<< HEAD
         return Response({"message":"Logged out successfully"},status=status.HTTP_200_OK)
     
+=======
+        return Response({"message":"Logged out successfully"},status=status.HTTP_200_OK)
+>>>>>>> second

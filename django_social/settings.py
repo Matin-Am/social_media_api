@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig', 
     'home.apps.HomeConfig',
     "rest_framework",
-    "rest_framework.authtoken"
+    "rest_framework.authtoken" , 
+    "storages"
 ]
 
 MIDDLEWARE = [
@@ -148,7 +149,26 @@ SESSION_COOKIE_AGE = 1800 #seconds
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 
+#Arvan cloud object storages 
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+          "access_key":str(os.getenv("ARVAN_ACCESS_KEY")),
+          "secret_key":str(os.getenv("ARVAN_SECRET_KEY")),
+          "endpoint_url":"https://s3.ir-thr-at1.arvanstorage.ir",
+          "bucket_name":str(os.getenv("ARVAN_BUCKET_NAME"))
+        },
+    },
+   "staticfiles": {
+    "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
+}
+
+}
 
 
-
-
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
