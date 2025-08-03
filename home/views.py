@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from .serializers import PostSerializer
-from .custome_permissions import AdminOrIsowneronlyPermission 
+from .custome_permissions import AdminOrIsowneronlyPermission , FollowOthersPermission
 from rest_framework.permissions import IsAuthenticated
 from .models import Post , Relation
 from accounts.models import User
@@ -53,13 +53,12 @@ class UserDeletePostAPI(APIView):
     
 class UserFollowAPI(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-    def get(self,request,user_id):
+    permission_classes = [FollowOthersPermission]
+    def post(self,request,user_id):
         user = get_object_or_404(User,id=user_id)
-        if user == request.user:
-            return Response({"message":"You can't follow yourself ! "},status=status.HTTP_400_BAD_REQUEST)
-        relation = Relation.objects.get_or_create(from_user=request.user,to_user=user)
-        if not relation:
+        self.check_object_permissions(request,user)
+        relation , created = Relation.objects.get_or_create(from_user=request.user,to_user=user)
+        if created is False:
             return Response({"message":"You already followed this user"},status=status.HTTP_400_BAD_REQUEST)
         return Response({"message":"You followed this user"},status=status.HTTP_200_OK)
     
