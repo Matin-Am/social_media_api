@@ -6,7 +6,7 @@ class PostSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Post
-        fields= ("user","body","description","file")
+        fields= ("user","body","description","file","id")
         extra_kwargs = {
             "body":{"required":True},
             "file":{"required":True},
@@ -29,8 +29,10 @@ class PostSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
             instance.body = validated_data.get("body",instance.body)
-            instance.slug = slugify(validated_data.get("body")[:30])
+            instance.slug = validated_data.get("slug",slugify(instance.body)[:30])
             instance.description = validated_data.get("description",instance.description)
             instance.file = validated_data.get("file",instance.file)
             instance.save()
             return instance
+
+
