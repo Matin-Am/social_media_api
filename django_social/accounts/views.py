@@ -61,6 +61,9 @@ class UserLogoutAPI(APIView):
     authentication_classes = [TokenAuthentication,]
     def get(self,request,format=None):
         request.user.auth_token.delete()
+<<<<<<< HEAD
         return Response({"message":"Logged out successfully"},status=status.HTTP_200_OK)
     
+=======
+        return Response({"message":"Logged out successfully"},status=status.HTTP_200_OK)
 >>>>>>> second
