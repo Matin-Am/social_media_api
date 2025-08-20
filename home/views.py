@@ -1,11 +1,12 @@
 from django.shortcuts import render , get_object_or_404 
+from django.db.models import Count
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status , viewsets
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from .serializers import PostSerializer
 from .custome_permissions import AdminOrIsowneronlyPermission , FollowOthersPermission
-from rest_framework.permissions import IsAuthenticated
 from .models import Post , Relation
 from accounts.models import User
 
@@ -76,12 +77,31 @@ class UserFollowAPI(APIView):
 class UserUnfollowAPI(APIView):
     def delete(self,request,user_id):
         user = get_object_or_404(User,id=user_id)
+        self.check_object_permissions(request,user)
         relation = Relation.objects.filter(from_user=request.user , to_user=user)
         if relation.exists():
             relation.delete()
             return Response({"Message":"User unfollowed successfully"},status=status.HTTP_200_OK)
         return Response({"Error":"You are already not following this user"},status=status.HTTP_400_BAD_REQUEST)
     
-class UserListRelationAPI(APIView):
+class UserListRelationsAPI(APIView):
+    def get(self,request,user_id):
+       user = get_object_or_404(User,pk=user_id)
+       followers = User.objects.annotate(followers_count=Count("followers")).get(id=user_id)
+       followings = User.objects.annotate(followings_count=Count("followings")).get(id=user_id)
+       return Response({
+            "user": {
+                "id": str(user.id),
+                "email": str(user.email),
+                "followers": followers.followers_count,
+                "followings": followings.followings_count,
+            }
+        },status=status.HTTP_200_OK)
+    
+class AllUsersListRelationAPI(APIView):
     def get(self,request):
-        pass
+        users = User.objects.annotate(
+            followers_count=Count("followers",distinct=True),
+            followings_count=Count("followings",distinct=True)
+        ).values("email","followers_count","followings_count")
+        return Response({"users":users})

@@ -13,7 +13,7 @@ class AdminOrIsowneronlyPermission(permissions.BasePermission):
     
 
 class FollowOthersPermission(permissions.BasePermission):
-    message = "You cant follow yourself !"
+    message = "You cant follow or unfollow yourself !"
 
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user

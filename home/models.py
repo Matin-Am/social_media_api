@@ -32,8 +32,8 @@ class Post(models.Model):
 
 
 class Relation(models.Model):
-    from_user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE , related_name="followers",db_column="from_user")
-    to_user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE,related_name="followings",db_column="to_user")
+    from_user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE , related_name="followings",db_column="from_user")
+    to_user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE,related_name="followers",db_column="to_user")
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -41,3 +41,4 @@ class Relation(models.Model):
 
     def __str__(self):
         return f"{self.from_user.phone_number} is following {self.to_user.phone_number}"
+

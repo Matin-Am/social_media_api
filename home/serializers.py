@@ -34,3 +34,5 @@ class PostSerializer(serializers.ModelSerializer):
             instance.file = validated_data.get("file",instance.file)
             instance.save()
             return instance
+
+
