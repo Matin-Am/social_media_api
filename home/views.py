@@ -13,6 +13,14 @@ from accounts.models import User
 # Create your views here.
 
 class PostViewSet(viewsets.ViewSet):
+    """
+    This Viewset is used for CRUD operations for our 'Post' model
+    CRUD operations:
+        C : creating post 
+        R : retrieve or reading post(s)
+        U : updating post
+        D : deleting post
+    """
     authentication_classes = [TokenAuthentication]
     permission_classes = []
     serializer_class = PostSerializer
@@ -64,6 +72,9 @@ class PostViewSet(viewsets.ViewSet):
     
 
 class UserFollowAPI(APIView):
+    """
+        With this api user is able to unfollow other users
+    """
     authentication_classes = [TokenAuthentication]
     permission_classes = [FollowOthersPermission]
     def post(self,request,user_id):
@@ -75,6 +86,11 @@ class UserFollowAPI(APIView):
         return Response({"message":"You followed this user"},status=status.HTTP_200_OK)
     
 class UserUnfollowAPI(APIView):
+    """
+    With this api user is able to unfollow other users
+    """
+    permission_classes = [FollowOthersPermission]
+    authentication_classes = [TokenAuthentication]
     def delete(self,request,user_id):
         user = get_object_or_404(User,id=user_id)
         self.check_object_permissions(request,user)
@@ -85,23 +101,33 @@ class UserUnfollowAPI(APIView):
         return Response({"Error":"You are already not following this user"},status=status.HTTP_400_BAD_REQUEST)
     
 class UserListRelationsAPI(APIView):
+    """
+    This api shows all relations of a specific user 
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request,user_id):
        user = get_object_or_404(User,pk=user_id)
-       followers = User.objects.annotate(followers_count=Count("followers")).get(id=user_id)
-       followings = User.objects.annotate(followings_count=Count("followings")).get(id=user_id)
+       followers = user.followers.count()
+       followings = user.followings.count()
        return Response({
             "user": {
                 "id": str(user.id),
                 "email": str(user.email),
-                "followers": followers.followers_count,
-                "followings": followings.followings_count,
+                "followers": followers ,
+                "followings": followings
             }
         },status=status.HTTP_200_OK)
     
 class AllUsersListRelationAPI(APIView):
+    """
+    This api shows the whole relations(followers and followings) of all users 
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         users = User.objects.annotate(
             followers_count=Count("followers",distinct=True),
             followings_count=Count("followings",distinct=True)
-        ).values("email","followers_count","followings_count")
+        ).values("id","email","followers_count","followings_count")
         return Response({"users":users})

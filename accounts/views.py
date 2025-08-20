@@ -12,6 +12,9 @@ import random
 # Create your views here.
 
 class UserRegistrationAPI(APIView):
+    """
+    This api will send user an otp code throughout smtp email service
+    """
     serializer_class = UserRegistrationSerializer
     def post(self,request):
         ser_data = self.serializer_class(data=request.data)
@@ -26,6 +29,9 @@ class UserRegistrationAPI(APIView):
         return Response(ser_data.errors,status=status.HTTP_400_BAD_REQUEST)
 
 class UserVerifyCodeAPI(APIView):
+    """
+    This api will create a user in database when user verifies the code
+    """
     serializer_class = VerifyCodeSerializer
     def post(self,request):
         ser_data = VerifyCodeSerializer(data=request.data)
