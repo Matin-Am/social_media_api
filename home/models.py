@@ -47,7 +47,7 @@ class Comment(models.Model):
     user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE,related_name="ucomments")
     post = models.ForeignKey(Post,on_delete=models.CASCADE)
     body = models.TextField()
-    reply_to = models.ForeignKey("Comment",on_delete=models.SET_NULL,related_name="rcomments")
+    reply_to = models.ForeignKey("Comment",on_delete=models.SET_NULL,related_name="rcomments",null=True,blank=True)
     is_reply = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
