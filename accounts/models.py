@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser , AbstractBaseUser
 from django.utils import timezone
 from datetime import timedelta
 from django.core.validators import MaxValueValidator , MinValueValidator
+from django.db.models import Q
 # Create your models here.
 
 
@@ -51,7 +52,9 @@ class OtpCode(models.Model):
     class Meta:
         ordering = ("-created",)
         db_table = "otpcode"
-
+        constraints  = [
+            models.CheckConstraint(check=Q(code__range=(1000,9999)),name="otpcode_check_age")
+        ]
 
 class Profile(models.Model):
     user = models.OneToOneField(User , on_delete=models.CASCADE)
@@ -60,6 +63,10 @@ class Profile(models.Model):
 
     class Meta:
         db_table = "profile"
-    
+        constraints = [
+            models.CheckConstraint(check=Q(age__range=(1,99)),name="otpcode_age_check")
+        ] 
+
     def __str__(self):
         return f"{self.user} - {self.age} Years Old"
+    

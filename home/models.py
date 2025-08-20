@@ -1,11 +1,10 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+import os
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 def validate_file_extentions(value):
-    import os
-    from django.core.exceptions import ValidationError
-
     ext = os.path.splitext(value.name)[1]
     valid_extensions = ['.jpg', '.jpeg', '.png', '.mp4', '.mov']
     if not ext.lower() in valid_extensions:
@@ -42,3 +41,19 @@ class Relation(models.Model):
     def __str__(self):
         return f"{self.from_user.phone_number} is following {self.to_user.phone_number}"
 
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE,related_name="ucomments")
+    post = models.ForeignKey(Post,on_delete=models.CASCADE)
+    body = models.TextField()
+    reply_to = models.ForeignKey("Comment",on_delete=models.SET_NULL,related_name="rcomments")
+    is_reply = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "comment"
+
+    def __str__(self):
+        return f"{self.user} - {self.post}"
