@@ -5,9 +5,9 @@ from rest_framework.response import Response
 from rest_framework import status , viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from .serializers import PostSerializer
-from .custome_permissions import AdminOrIsowneronlyPermission , FollowOthersPermission
-from .models import Post , Relation
+from .serializers import PostSerializer,CommentSerializer
+from .custome_permissions import AdminOrIsowneronlyPermission,FollowOthersPermission
+from .models import Post,Relation,Comment
 from accounts.models import User
 
 # Create your views here.
@@ -131,3 +131,22 @@ class AllUsersListRelationAPI(APIView):
             followings_count=Count("followings",distinct=True)
         ).values("id","email","followers_count","followings_count")
         return Response({"users":users})
+
+class CreateCommentAPI(APIView):
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    
+    def post(self,request,post_id,comment_id=None):
+        reply_to=None
+        post = get_object_or_404(Post,pk=post_id)
+        if comment_id:
+            reply_to = get_object_or_404(Comment,pk=comment_id)
+        ser_data = self.serializer_class(data=request.data,context={
+            "request":request,
+            "post":post,
+            "reply_to":reply_to
+        })
+        if ser_data.is_valid(raise_exception=True):
+            comment=ser_data.save()
+            return Response(self.serializer_class(comment).data,status=status.HTTP_200_OK)

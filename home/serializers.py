@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post
+from .models import Post  ,Comment
 from django.utils.text import slugify
 
 class PostSerializer(serializers.ModelSerializer):
@@ -36,3 +36,35 @@ class PostSerializer(serializers.ModelSerializer):
             return instance
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField(read_only=True)
+    post = serializers.SlugRelatedField(read_only=True,slug_field="slug")
+    class Meta: 
+        model = Comment
+        fields = ("body","user","post","reply_to","is_reply")
+        extra_kwargs = {
+            "body":{"required":True},
+            "reply_to":{"read_only":True},
+            "is_reply":{"read_only":True},
+        }
+    def get_post(self,obj):
+        return f"{obj.user} - {obj.body}"
+
+    def create(self, validated_data):
+        is_reply=False
+        request = self.context.get("request")
+        post = self.context.get("post")
+        reply_to = self.context.get("reply_to")
+        if reply_to:
+            if reply_to and reply_to.post != post:
+                raise serializers.ValidationError('Reply comment must belong to the same post !')
+            is_reply=True
+        comment = Comment.objects.create(
+            user=request.user,
+            post=post,
+            body=validated_data.get("body"),
+            reply_to=reply_to,
+            is_reply=is_reply
+
+        )
+        return comment

@@ -54,6 +54,7 @@ class Comment(models.Model):
 
     class Meta:
         db_table = "comment"
+        ordering = ("-created",)
 
     def __str__(self):
-        return f"{self.user} - {self.post}"
+        return f"{self.user}: {self.body[:30]}"
