@@ -1,0 +1,41 @@
+services:
+  backend: 
+    image: social-media-app 
+    build: . 
+    container_name: social_django
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - 8000:8000
+    volumes:
+      - ./django_social:/app 
+    env_file: 
+      - .env  
+    depends_on:
+      - db
+  db:
+    image: postgres:15
+    container_name: postgres_db 
+    restart: always 
+    environment:
+      POSTGRES_DB: social_media
+      POSTGRES_USER: ${USER_POSTGRESQL}
+      POSTGRES_PASSWORD: ${PASSWORD_POSTGRESQL} 
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  rabbitmq: 
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=matin
+      - RABBITMQ_DEFAULT_PASSWORD=matin
+      - RABBITMQ_DEFAULT_VHOST=matin_vhost
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+
+volumes:
+  postgres_data:
