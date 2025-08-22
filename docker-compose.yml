@@ -2,7 +2,7 @@ services:
   backend: 
     image: social-media-app 
     build: . 
-    container_name: django
+    container_name: social_django
     command: python manage.py runserver 0.0.0.0:8000
     ports:
       - 8000:8000
@@ -17,9 +17,9 @@ services:
     container_name: postgres_db 
     restart: always 
     environment:
-      - POSTGRES_DB: social_media
-      - POSTGRES_USER: ${USER_POSTGRESQL}
-      - POSTGRES_PASSWORD: ${PASSWORD_POSTGRESQL} 
+      POSTGRES_DB: social_media
+      POSTGRES_USER: ${USER_POSTGRESQL}
+      POSTGRES_PASSWORD: ${PASSWORD_POSTGRESQL} 
     ports:
       - 5432:5432
     volumes:
