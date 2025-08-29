@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig', 
     'home.apps.HomeConfig',
     "rest_framework",
-    'rest_framework.authtoken',
+    "rest_framework.authtoken" , 
+    "storages"
 ]
 
 MIDDLEWARE = [
@@ -115,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tehran'
 
 USE_I18N = True
 
@@ -134,3 +135,34 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 AUTH_USER_MODEL = "accounts.User"
+
+# SMTP EMAIL 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST_USER = str(os.getenv("EMAIL_USER"))
+EMAIL_HOST_PASSWORD = str(os.getenv("EMAIL_PASSWORD"))
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+# Session Management 
+SESSION_COOKIE_AGE = 1800 #seconds 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+
+#Arvan cloud object storages 
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+          "access_key":str(os.getenv("ARVAN_ACCESS_KEY")),
+          "secret_key":str(os.getenv("ARVAN_SECRET_KEY")),
+          "endpoint_url":"https://s3.ir-thr-at1.arvanstorage.ir",
+          "bucket_name":str(os.getenv("ARVAN_BUCKET_NAME"))
+        },
+    },
+   "staticfiles": {
+    "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
+}
+
+}
+
