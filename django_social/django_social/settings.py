@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig', 
     'home.apps.HomeConfig',
     "rest_framework",
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -85,7 +86,7 @@ DATABASES = {
         'USER':str(os.getenv("USER_POSTGRESQL")),
         'PASSWORD':str(os.getenv("PASSWORD_POSTGRESQL")),
         'PORT':'5432',
-        'HOST':str(os.getenv("HOST_POSTGRESQL"))
+        'HOST':"db"
     }
 }
 
