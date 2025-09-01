@@ -1,12 +1,16 @@
 from rest_framework import serializers
 from .models import Post  ,Comment
 from django.utils.text import slugify
+from rest_framework.reverse import reverse
+
 
 class PostSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField(read_only=True)
+    relative_url = serializers.URLField(source="get_absolute_url",read_only=True)
+    absolute_url = serializers.SerializerMethodField(method_name="abs_url",read_only=True)
     class Meta:
         model = Post
-        fields= ("user","body","description","file","id")
+        fields= ("user","body","description","id","relative_url","absolute_url")
         extra_kwargs = {
             "body":{"required":True},
             "file":{"required":True},
@@ -15,7 +19,12 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_user(self,obj):
         return f"{obj.user.phone_number} - {obj.user.email}"
-        
+    
+    def abs_url(self,obj):
+        request = self.context.get("request")
+        return request.build_absolute_uri(obj.get_absolute_url())
+
+
     def create(self, validated_data ):
        request = self.context["request"]
        post = Post.objects.create(
