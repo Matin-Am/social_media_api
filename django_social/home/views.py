@@ -3,7 +3,7 @@ from django.db.models import Count
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status , viewsets
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.authentication import TokenAuthentication,SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .serializers import PostSerializer,CommentSerializer
 from .custome_permissions import AdminOrIsowneronlyPermission,FollowOthersPermission
@@ -25,7 +25,7 @@ class PostViewSet(viewsets.ModelViewSet):
      """
     serializer_class = PostSerializer
     permission_classes = []
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication,SessionAuthentication]
     queryset = Post.objects.all()
 
     def partial_update(self, request, *args, **kwargs):
@@ -37,7 +37,7 @@ class PostViewSet(viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
     
     def get_permissions(self):
-        if self.action == "destroy" or self.action == "partial_update":
+        if self.action in ("update","partial_update","destroy"):
             self.permission_classes = [AdminOrIsowneronlyPermission]
         if self.action == "create":
             self.permission_classes = [IsAuthenticated]

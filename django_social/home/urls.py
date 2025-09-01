@@ -12,6 +12,6 @@ urlpatterns  = [
     path("comment/<int:post_id>/<int:comment_id>/",views.CreateCommentAPI.as_view(),name="reply_comment")
 ]
 
-router = routers.SimpleRouter()
+router = routers.DefaultRouter()
 router.register("post",views.PostViewSet,basename="post")
 urlpatterns += router.urls

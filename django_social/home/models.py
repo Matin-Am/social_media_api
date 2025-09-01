@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.urls import reverse
 import os
 from django.core.exceptions import ValidationError
 
@@ -22,13 +23,13 @@ class Post(models.Model):
 
     class Meta:
         db_table = "post"
+        ordering = ("-created",)
 
     def __str__(self):
         return f"{self.user} - {self.description}"
     
-    class Meta:
-        ordering = ("-created",)
-
+    def get_absolute_url(self):
+        return reverse("home:post-detail",kwargs={"pk":self.pk})
 
 class Relation(models.Model):
     from_user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE , related_name="followings",db_column="from_user")
