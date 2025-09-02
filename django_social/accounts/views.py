@@ -52,8 +52,16 @@ class UserVerifyCodeAPIView(APIView):
                 request.session.flush()
                 return Response(UserRegistrationSerializer(user).data,status=status.HTTP_201_CREATED)
         return Response(ser_data.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
+class ResendCodeAPIView(APIView):
+    def post(self):
+        pass
+
+
 class UserLogoutAPIView(APIView):
+    authentication_classes = [TokenAuthentication,SessionAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request,format=None):
         request.user.auth_token.delete()
         return Response({"message":"Logged out successfully"},status=status.HTTP_200_OK)
