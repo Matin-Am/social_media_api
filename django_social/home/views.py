@@ -1,5 +1,7 @@
 from django.shortcuts import render , get_object_or_404 
 from django.db.models import Count
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status , viewsets
@@ -9,7 +11,7 @@ from .serializers import PostSerializer,CommentSerializer
 from .custome_permissions import AdminOrIsowneronlyPermission,FollowOthersPermission
 from .models import Post,Relation,Comment
 from accounts.models import User
-
+import time
 # Create your views here.
 
 
@@ -27,6 +29,11 @@ class PostViewSet(viewsets.ModelViewSet):
     permission_classes = []
     authentication_classes = [TokenAuthentication,SessionAuthentication]
     queryset = Post.objects.all()
+    
+    @method_decorator(cache_page(60 * 15, key_prefix="list_posts"))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+    
 
     def partial_update(self, request, *args, **kwargs):
         self.check_object_permissions(request,self.get_object())
@@ -42,8 +49,6 @@ class PostViewSet(viewsets.ModelViewSet):
         if self.action == "create":
             self.permission_classes = [IsAuthenticated]
         return [permission() for permission in self.permission_classes]
-
-
 
 
 class UserFollowAPI(APIView):

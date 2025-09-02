@@ -9,6 +9,7 @@ click-didyoumean==0.3.1
 click-plugins==1.1.1.2
 click-repl==0.3.0
 Django==5.2.4
+django-redis==6.0.0
 django-rest-framework==0.1.0
 django-storages==1.14.6
 djangorestframework==3.16.0
@@ -20,6 +21,8 @@ psycopg2-binary==2.9.10
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
 pytz==2025.2
+redis==6.4.0
+hiredis==3.2.1
 s3transfer==0.13.0
 six==1.17.0
 sqlparse==0.5.3
