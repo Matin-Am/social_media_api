@@ -1,15 +1,19 @@
 from django.shortcuts import render
+from django.contrib.auth import password_validation
+from django.core.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import UserRegistrationSerializer , VerifyCodeSerializer
+from rest_framework.authentication import SessionAuthentication,TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from .serializers import UserRegistrationSerializer,VerifyCodeSerializer,ChangePasswordSerializer
 from .models import User , OtpCode
 from utils  import send_otp_code
 from .sessions import Data
 import random
 # Create your views here.
 
-class UserRegistrationAPI(APIView):
+class UserRegistrationAPIView(APIView):
     serializer_class = UserRegistrationSerializer
     def post(self,request):
         ser_data = self.serializer_class(data=request.data)
@@ -23,7 +27,7 @@ class UserRegistrationAPI(APIView):
             return Response({"Message":"We sent you a code , please check your email"},status=status.HTTP_200_OK)
         return Response(ser_data.errors,status=status.HTTP_400_BAD_REQUEST)
 
-class UserVerifyCodeAPI(APIView):
+class UserVerifyCodeAPIView(APIView):
     serializer_class = VerifyCodeSerializer
     def post(self,request):
         ser_data = VerifyCodeSerializer(data=request.data)
@@ -49,7 +53,29 @@ class UserVerifyCodeAPI(APIView):
                 return Response(UserRegistrationSerializer(user).data,status=status.HTTP_201_CREATED)
         return Response(ser_data.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class UserLogoutAPI(APIView):
+class UserLogoutAPIView(APIView):
     def get(self,request,format=None):
         request.user.auth_token.delete()
         return Response({"message":"Logged out successfully"},status=status.HTTP_200_OK)
+
+
+class ChangePasswordAPIView(APIView):
+    authentication_classes = [TokenAuthentication,SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = ChangePasswordSerializer
+    
+    def post(self,request):
+        user = request.user
+        ser_data = self.serializer_class(data=request.data)
+        ser_data.is_valid(raise_exception=True)
+        if not user.check_password(raw_password=ser_data.validated_data.get("old_password")):
+            return Response({"Old password":"Wrong password !"},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            password_validation.validate_password(
+                password=ser_data.validated_data.get("new_password"),
+                user=user)
+        except ValidationError as e:
+            return Response({"Error":e.messages},status=status.HTTP_400_BAD_REQUEST)
+        user.set_password(ser_data.validated_data.get("new_password"))
+        user.save()
+        return Response({"Message":"Password changed successfully"},status=status.HTTP_200_OK)

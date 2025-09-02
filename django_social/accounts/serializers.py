@@ -29,7 +29,9 @@ class UserRegistrationSerializer(serializers.Serializer):
         return value
 
 
-
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(min_length=8,write_only=True)
 
 
 class VerifyCodeSerializer(serializers.ModelSerializer):
