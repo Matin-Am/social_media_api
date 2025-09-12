@@ -1,13 +1,14 @@
 import time
-from django.shortcuts import render , get_object_or_404 
+from django.shortcuts import get_object_or_404 
 from django.db.models import Count
-from django.views.decorators.cache import cache_page
-from django.utils.decorators import method_decorator
+from django.core.cache import cache
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status , viewsets
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.filters import SearchFilter
 from .serializers import PostSerializer,CommentSerializer
 from .custome_permissions import AdminOrIsowneronlyPermission,FollowOthersPermission
 from .models import Post,Relation,Comment
@@ -28,6 +29,8 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = []
     authentication_classes = [TokenAuthentication,SessionAuthentication]
+    filter_backends = [SearchFilter]
+    search_fields = ["body","description"]
     queryset = Post.objects.all()
     
     def get_permissions(self):
@@ -37,10 +40,15 @@ class PostViewSet(viewsets.ModelViewSet):
             self.permission_classes = [IsAuthenticated]
         return [permission() for permission in self.permission_classes]
 
-    @method_decorator(cache_page(60 * 30,key_prefix="list_posts"))
     def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
-
+        cached_key = f"list_posts_{request.user.id}" or f"list_posts_anon"
+        cached_data = cache.get(cached_key)
+        if cached_data is None:
+            result = super().list(request, *args, **kwargs)
+            cache.set(cached_key,result.data,timeout= 60 * 15)
+            return result
+        return Response(cached_data)
+    
 class UserFollowAPI(APIView):
     """
         With this api user is able to unfollow other users
