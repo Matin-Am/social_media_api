@@ -8,11 +8,14 @@ from rest_framework.response import Response
 from rest_framework import status , viewsets
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from .serializers import PostSerializer,CommentSerializer
 from .custome_permissions import AdminOrIsowneronlyPermission,FollowOthersPermission
 from .models import Post,Relation,Comment
-from .paginations import PostResultsPagination
+from .paginations import DefaultPagination
+from .filters import PostFilter
 from accounts.models import User
 
 # Create your views here.
@@ -30,8 +33,9 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = []
     authentication_classes = [TokenAuthentication,SessionAuthentication]
-    pagination_class = PostResultsPagination
-    filter_backends = [SearchFilter]
+    pagination_class = DefaultPagination
+    filter_backends = [DjangoFilterBackend,SearchFilter]
+    filterset_class = PostFilter
     search_fields = ["body","description"]
     queryset = Post.objects.all()
     
@@ -85,7 +89,7 @@ class UserListRelationsAPI(APIView):
     """
     This api shows all relations of a specific user 
     """
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication,SessionAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self,request,user_id):
        user = get_object_or_404(User,pk=user_id)
@@ -104,14 +108,17 @@ class AllUsersListRelationAPI(APIView):
     """
     This api shows the whole relations(followers and followings) of all users 
     """
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication,SessionAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self,request):
         users = User.objects.annotate(
             followers_count=Count("followers",distinct=True),
             followings_count=Count("followings",distinct=True)
         ).values("id","email","followers_count","followings_count")
-        return Response({"users":users})
+        paginator = PageNumberPagination()
+        paginator.page_size = 2
+        results = paginator.paginate_queryset(users,request)
+        return paginator.get_paginated_response(results)
 
 class CreateCommentAPI(APIView):
     serializer_class = CommentSerializer

@@ -7,7 +7,7 @@ app_name = "home"
 urlpatterns  = [
     path("follow/<int:user_id>/",views.UserFollowAPI.as_view(),name="user_follow"),
     path("unfollow/<int:user_id>/",views.UserUnfollowAPI.as_view(),name="user_unfollow"),
-    path("relations/",cache_page(60 * 30,key_prefix="list_relations")(views.AllUsersListRelationAPI.as_view()),name="relations"),
+    path("relations/",views.AllUsersListRelationAPI.as_view(),name="relations"),
     path("relations/<int:user_id>/",views.UserListRelationsAPI.as_view(),name="user_relations"),
     path("comment/<int:post_id>/",views.CreateCommentAPI.as_view(),name="create_comment"),
     path("comment/<int:post_id>/<int:comment_id>/",views.CreateCommentAPI.as_view(),name="reply_comment")
