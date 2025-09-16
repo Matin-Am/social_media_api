@@ -2,7 +2,7 @@ import time
 from django.shortcuts import get_object_or_404 
 from django.db.models import Count
 from django.core.cache import cache
-from django_filters.rest_framework import DjangoFilterBackend
+from django.utils.http import urlencode
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status , viewsets
@@ -12,11 +12,12 @@ from rest_framework.filters import SearchFilter
 from .serializers import PostSerializer,CommentSerializer
 from .custome_permissions import AdminOrIsowneronlyPermission,FollowOthersPermission
 from .models import Post,Relation,Comment
+from .paginations import PostResultsPagination
 from accounts.models import User
+
 # Create your views here.
 
 
-    
 class PostViewSet(viewsets.ModelViewSet):
     """
     This ModelViewset is used for CRUD operations for our 'Post' model
@@ -29,6 +30,7 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = []
     authentication_classes = [TokenAuthentication,SessionAuthentication]
+    pagination_class = PostResultsPagination
     filter_backends = [SearchFilter]
     search_fields = ["body","description"]
     queryset = Post.objects.all()
@@ -41,7 +43,8 @@ class PostViewSet(viewsets.ModelViewSet):
         return [permission() for permission in self.permission_classes]
 
     def list(self, request, *args, **kwargs):
-        cached_key = f"list_posts_{request.user.id}" or f"list_posts_anon"
+        params = urlencode(sorted(request.GET.items()))
+        cached_key = f"list_posts_{request.user.id}_{params}" or f"list_posts_anon"
         cached_data = cache.get(cached_key)
         if cached_data is None:
             result = super().list(request, *args, **kwargs)
