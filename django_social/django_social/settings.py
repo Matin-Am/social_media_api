@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken" , 
     "storages", 
     "django_filters",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -175,3 +176,17 @@ STORAGES = {
 
 }
 
+
+REST_FRAMEWORK = {
+    
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+#API Documentation
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Social Media API',
+    'DESCRIPTION': 'This is my api documentation for other programmers',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    
+}
