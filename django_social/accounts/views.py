@@ -6,7 +6,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication,TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from .serializers import UserRegistrationSerializer,VerifyCodeSerializer,ChangePasswordSerializer
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from .serializers import UserRegistrationSerializer,VerifyCodeSerializer,ChangePasswordSerializer,AuthTokenSerializer
 from .models import User , OtpCode
 from utils  import send_otp_code
 from .sessions import Data
@@ -54,17 +56,25 @@ class UserVerifyCodeAPIView(APIView):
         return Response(ser_data.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ResendCodeAPIView(APIView):
-    def post(self):
-        pass
-
+class UserLoginAPIView(ObtainAuthToken):
+        serializer_class = AuthTokenSerializer
+        def post(self, request, *args, **kwargs):
+            serializer = self.serializer_class(data=request.data,context={"request":request})
+            serializer.is_valid(raise_exception=True)
+            user = serializer.validated_data['user']
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({
+                "token":token.key , 
+                "email":user.phone_number ,
+                "user_id":user.pk
+            },status=status.HTTP_201_CREATED)
 
 class UserLogoutAPIView(APIView):
     authentication_classes = [TokenAuthentication,SessionAuthentication]
     permission_classes = [IsAuthenticated]
-    def get(self,request,format=None):
+    def post(self,request,format=None):
         request.user.auth_token.delete()
-        return Response({"message":"Logged out successfully"},status=status.HTTP_200_OK)
+        return Response({"message":"Logged out successfully"},status=status.HTTP_204_NO_CONTENT)
 
 
 class ChangePasswordAPIView(APIView):
