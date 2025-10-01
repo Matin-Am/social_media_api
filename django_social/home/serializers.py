@@ -63,8 +63,6 @@ class CommentSerializer(serializers.ModelSerializer):
             "reply_to":{"read_only":True},
             "is_reply":{"read_only":True},
         }
-    def get_post(self,obj):
-        return f"{obj.user} - {obj.body}"
 
     def create(self, validated_data):
         is_reply=False

@@ -9,10 +9,9 @@ urlpatterns  = [
     path("unfollow/<int:user_id>/",views.UserUnfollowAPI.as_view(),name="user_unfollow"),
     path("relations/",views.AllUsersListRelationAPI.as_view(),name="relations"),
     path("relations/<int:user_id>/",views.UserListRelationsAPI.as_view(),name="user_relations"),
-    path("comment/<int:post_id>/",views.CreateCommentAPI.as_view(),name="create_comment"),
-    path("comment/<int:post_id>/<int:comment_id>/",views.CreateCommentAPI.as_view(),name="reply_comment")
+    path("comments/<int:post_id>/",views.PostCommentsAPIView.as_view(), name="post_comments"),
+    path("comments/<int:post_id>/<int:comment_id>/",views.PostCommentsAPIView.as_view(), name="comment_replies"),
 ]
-
 router = routers.DefaultRouter()
 router.register("post",views.PostViewSet,basename="post")
 urlpatterns += router.urls
