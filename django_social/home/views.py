@@ -3,14 +3,15 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Count
 from django.core.cache import cache
 from django.utils.http import urlencode
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status , viewsets
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.pagination import PageNumberPagination
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
+from rest_framework import generics
 from .serializers import PostSerializer,CommentSerializer
 from .custome_permissions import AdminOrIsowneronlyPermission,FollowOthersPermission
 from .models import Post,Relation,Comment
@@ -120,21 +121,34 @@ class AllUsersListRelationAPI(APIView):
         results = paginator.paginate_queryset(users,request)
         return paginator.get_paginated_response(results)
 
-class CreateCommentAPI(APIView):
+
+class PostCommentsAPIView(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
+    pagination_class = DefaultPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["post","user"]
+
+    def get_queryset(self):
+        comment_id = self.kwargs.get("comment_id")
+        post_id = self.kwargs.get("post_id")
+        if comment_id is not None: 
+            return Comment.objects.filter(post__id=post_id,reply_to__id=comment_id,is_reply=True)
+        return Comment.objects.filter(post__id=post_id)
     
-    def post(self,request,post_id,comment_id=None):
+    def get_serializer_context(self):
         reply_to=None
-        post = get_object_or_404(Post,pk=post_id)
-        if comment_id:
-            reply_to = get_object_or_404(Comment,pk=comment_id)
-        ser_data = self.serializer_class(data=request.data,context={
-            "request":request,
-            "post":post,
+        post = get_object_or_404(Post,pk=self.kwargs.get("post_id"))
+        if self.kwargs.get("comment_id"):
+            reply_to = get_object_or_404(Comment,pk=self.kwargs["comment_id"])
+        return {
+            'request': self.request,
+            'format': self.format_kwarg,
+            'view': self,
+            "post":post ,
             "reply_to":reply_to
-        })
-        if ser_data.is_valid(raise_exception=True):
-            comment=ser_data.save()
-            return Response(self.serializer_class(comment).data,status=status.HTTP_200_OK)
+        }
+    
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAuthenticated()]
+        return [AllowAny()]
