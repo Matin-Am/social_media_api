@@ -8,7 +8,7 @@ services:
       python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
-    restart: always 
+    # restart: always 
     volumes:
       - ./django_social:/app 
     env_file: 
@@ -20,7 +20,7 @@ services:
   db:
     image: postgres:15
     container_name: postgresql_social 
-    restart: always 
+    # restart: always 
     environment:
       POSTGRES_DB: social_media
       POSTGRES_USER: ${USER_POSTGRESQL}
@@ -33,7 +33,7 @@ services:
       - main
   rabbitmq: 
     image: rabbitmq:3-management
-    restart: always 
+    # restart: always 
     container_name: rabbitmq_social
     ports:
       - "5674:5672"
@@ -44,7 +44,7 @@ services:
   celery_worker: 
     build: .
     container_name: celery_social
-    restart: always 
+    # restart: always 
     command: celery -A django_social worker -l INFO
     volumes:
       - ./django_social:/app

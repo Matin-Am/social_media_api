@@ -1,4 +1,4 @@
-from django.shortcuts import render
+import random
 from django.contrib.auth import password_validation
 from django.core.exceptions import ValidationError
 from rest_framework.views import APIView
@@ -10,9 +10,8 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from .serializers import UserRegistrationSerializer,VerifyCodeSerializer,ChangePasswordSerializer,AuthTokenSerializer
 from .models import User , OtpCode
-from utils  import send_otp_code
 from .sessions import Data
-import random
+from .tasks import send_otp
 # Create your views here.
 
 class UserRegistrationAPIView(APIView):
@@ -24,7 +23,7 @@ class UserRegistrationAPIView(APIView):
             data = Data(request,cd["phone_number"],cd["email"])
             data.save_data(cd["password"])
             random_code = random.randint(1111,9999)
-            send_otp_code(cd["email"],random_code)
+            send_otp.apply_async(args=[cd["email"],random_code])
             OtpCode.objects.create(code=random_code,email=cd["email"])
             return Response({"Message":"We sent you a code , please check your email"},status=status.HTTP_200_OK)
         return Response(ser_data.errors,status=status.HTTP_400_BAD_REQUEST)
