@@ -9,10 +9,11 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 from dotenv import load_dotenv
-import os
+from datetime import timedelta
+
 load_dotenv() # Loads the config from .env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -46,6 +47,8 @@ INSTALLED_APPS = [
     #Third_party packages 
     "rest_framework",
     "rest_framework.authtoken" , 
+    "rest_framework_simplejwt",
+    'rest_framework_simplejwt.token_blacklist',
     "storages", 
     "django_filters",
     "drf_spectacular",
@@ -189,4 +192,11 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True
 }

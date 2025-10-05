@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import  OtpCode
 
 class UserRegistrationSerializer(serializers.Serializer):
@@ -75,3 +76,12 @@ class AuthTokenSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+
+class JwtTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data["phone_number"] = self.user.phone_number
+        data["email"] = self.user.email
+        data["user_id"] = self.user.pk
+        return data

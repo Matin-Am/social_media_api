@@ -8,7 +8,11 @@ from rest_framework.authentication import SessionAuthentication,TokenAuthenticat
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-from .serializers import UserRegistrationSerializer,VerifyCodeSerializer,ChangePasswordSerializer,AuthTokenSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.tokens import RefreshToken
+from .serializers import (UserRegistrationSerializer,VerifyCodeSerializer,ChangePasswordSerializer,
+                          AuthTokenSerializer,JwtTokenObtainPairSerializer)
 from .models import User , OtpCode
 from .sessions import Data
 from .tasks import send_otp
@@ -69,7 +73,7 @@ class UserLoginAPIView(ObtainAuthToken):
             },status=status.HTTP_201_CREATED)
 
 class UserLogoutAPIView(APIView):
-    authentication_classes = [TokenAuthentication,SessionAuthentication]
+    authentication_classes = [JWTAuthentication,TokenAuthentication]
     permission_classes = [IsAuthenticated]
     def post(self,request,format=None):
         request.user.auth_token.delete()
@@ -77,7 +81,7 @@ class UserLogoutAPIView(APIView):
 
 
 class ChangePasswordAPIView(APIView):
-    authentication_classes = [TokenAuthentication,SessionAuthentication]
+    authentication_classes = [JWTAuthentication,TokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = ChangePasswordSerializer
     
@@ -96,3 +100,18 @@ class ChangePasswordAPIView(APIView):
         user.set_password(ser_data.validated_data.get("new_password"))
         user.save()
         return Response({"Message":"Password changed successfully"},status=status.HTTP_200_OK)
+    
+class JwtTokenObtainPairView(TokenObtainPairView):
+    serializer_class = JwtTokenObtainPairSerializer
+
+class JwtTokenLogoutAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        try:
+            refresh = request.data["refresh"]
+            token = RefreshToken(refresh)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response({"detail":str(e)},status=status.HTTP_400_BAD_REQUEST)
