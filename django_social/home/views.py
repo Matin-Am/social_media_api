@@ -4,6 +4,7 @@ from django.db.models import Count
 from django.core.cache import cache
 from django.utils.http import urlencode
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status , viewsets
@@ -11,7 +12,7 @@ from rest_framework.authentication import TokenAuthentication,SessionAuthenticat
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter
-from rest_framework import generics
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from .serializers import PostSerializer,CommentSerializer
 from .custome_permissions import AdminOrIsowneronlyPermission,FollowOthersPermission
 from .models import Post,Relation,Comment
@@ -33,7 +34,7 @@ class PostViewSet(viewsets.ModelViewSet):
      """
     serializer_class = PostSerializer
     permission_classes = []
-    authentication_classes = [TokenAuthentication,SessionAuthentication]
+    authentication_classes = [JWTAuthentication,TokenAuthentication]
     pagination_class = DefaultPagination
     filter_backends = [DjangoFilterBackend,SearchFilter]
     filterset_class = PostFilter
@@ -61,7 +62,7 @@ class UserFollowAPI(APIView):
     """
         With this api user is able to unfollow other users
     """
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [JWTAuthentication,TokenAuthentication]
     permission_classes = [FollowOthersPermission]
     def post(self,request,user_id):
         user = get_object_or_404(User,id=user_id)
@@ -76,7 +77,7 @@ class UserUnfollowAPI(APIView):
     With this api user is able to unfollow other users
     """
     permission_classes = [FollowOthersPermission]
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [JWTAuthentication,TokenAuthentication]
     def delete(self,request,user_id):
         user = get_object_or_404(User,id=user_id)
         self.check_object_permissions(request,user)
@@ -90,7 +91,7 @@ class UserListRelationsAPI(APIView):
     """
     This api shows all relations of a specific user 
     """
-    authentication_classes = [TokenAuthentication,SessionAuthentication]
+    authentication_classes = [JWTAuthentication,TokenAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self,request,user_id):
        user = get_object_or_404(User,pk=user_id)
@@ -109,7 +110,7 @@ class AllUsersListRelationAPI(APIView):
     """
     This api shows the whole relations(followers and followings) of all users 
     """
-    authentication_classes = [TokenAuthentication,SessionAuthentication]
+    authentication_classes = [JWTAuthentication,TokenAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self,request):
         users = User.objects.annotate(
@@ -124,6 +125,7 @@ class AllUsersListRelationAPI(APIView):
 
 class PostCommentsAPIView(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
+    authentication_classes = [JWTAuthentication,TokenAuthentication]
     pagination_class = DefaultPagination
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["post","user"]

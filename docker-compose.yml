@@ -60,7 +60,7 @@ services:
       - main
 
   redis:
-    restart: unless-stopped
+    # restart: unless-stopped
     command: redis-server --appendonly yes
     image: redis:latest
     volumes:
