@@ -40,7 +40,7 @@ class User(AbstractBaseUser):
 class OtpCode(models.Model):
     code = models.SmallIntegerField(validators=[MinValueValidator(1000),MaxValueValidator(9999)])
     email = models.EmailField(max_length=100)
-    created = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.email} - {self.code}"
