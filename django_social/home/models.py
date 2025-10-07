@@ -18,8 +18,8 @@ class Post(models.Model):
     body = models.TextField(max_length=400)
     description = models.TextField(max_length=100)
     file = models.FileField(upload_to="posts/",validators=[validate_file_extentions,])
-    created = models.DateTimeField(auto_now=True)
-    updated = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "post"
