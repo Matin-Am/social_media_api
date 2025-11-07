@@ -3,16 +3,22 @@ services:
     image: social-media-app 
     build: . 
     container_name: django_social
-    command: sh -c "python manage.py makemigrations && 
-      python manage.py migrate &&
-      python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
     # restart: always 
     volumes:
       - ./django_social:/app 
-    env_file: 
-      - .env  
+    environment:
+      POSTGRES_USER: ${USER_POSTGRESQL}
+      POSTGRES_PASSWORD: ${PASSWORD_POSTGRESQL} 
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      EMAIL_USER: ${EMAIL_USER}
+      ARVAN_ACCESS_KEY: ${ARVAN_ACCESS_KEY}
+      ARVAN_SECRET_KEY: ${ARVAN_SECRET_KEY}
+      ARVAN_BUCKET_NAME: ${ARVAN_BUCKET_NAME}
+
+
     depends_on:
       - db
     networks:
@@ -48,14 +54,19 @@ services:
     command: celery -A django_social worker -l INFO
     volumes:
       - ./django_social:/app
-    env_file: 
-      - .env  
     depends_on:
       - backend
       - rabbitmq
       - db 
     environment:
-      - CELERY_FORCE_ROOT="true"
+        CELERY_FORCE_ROOT: true
+        POSTGRES_USER: ${USER_POSTGRESQL}
+        POSTGRES_PASSWORD: ${PASSWORD_POSTGRESQL}
+        EMAIL_PASS: ${EMAIL_PASSWORD}
+        EMAIL_USER: ${EMAIL_USER}
+        ARVAN_ACCESS_KEY: ${ARVAN_ACCESS_KEY}
+        ARVAN_SECRET_KEY: ${ARVAN_SECRET_KEY}
+        ARVAN_BUCKET_NAME: ${ARVAN_BUCKET_NAME}
     networks:
       - main
 

@@ -91,8 +91,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'social_media',
-        'USER':str(os.getenv("USER_POSTGRESQL")),
-        'PASSWORD':str(os.getenv("PASSWORD_POSTGRESQL")),
+        'USER':str(os.getenv("POSTGRES_USER",default="")),
+        'PASSWORD':str(os.getenv("POSTGRES_PASSWORD",default="")),
         'PORT':'5432',
         'HOST':"db"
     }
@@ -151,8 +151,8 @@ AUTH_USER_MODEL = "accounts.User"
 
 # SMTP EMAIL 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST_USER = str(os.getenv("EMAIL_USER"))
-EMAIL_HOST_PASSWORD = str(os.getenv("EMAIL_PASSWORD"))
+EMAIL_HOST_USER = str(os.getenv("EMAIL_USER",default=""))
+EMAIL_HOST_PASSWORD = str(os.getenv("EMAIL_PASSWORD",default=""))
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
@@ -167,10 +167,10 @@ STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3.S3Storage",
         "OPTIONS": {
-          "access_key":str(os.getenv("ARVAN_ACCESS_KEY")),
-          "secret_key":str(os.getenv("ARVAN_SECRET_KEY")),
+          "access_key":str(os.getenv("ARVAN_ACCESS_KEY",default="")),
+          "secret_key":str(os.getenv("ARVAN_SECRET_KEY",default="")),
           "endpoint_url":"https://s3.ir-thr-at1.arvanstorage.ir",
-          "bucket_name":str(os.getenv("ARVAN_BUCKET_NAME"))
+          "bucket_name":str(os.getenv("ARVAN_BUCKET_NAME",default=""))
         },
     },
    "staticfiles": {
