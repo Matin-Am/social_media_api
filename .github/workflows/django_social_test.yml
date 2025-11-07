@@ -1,0 +1,28 @@
+name: Django Social 
+
+on:
+  push:
+    branches: [ "master" , "second" ]
+  pull_request:
+    branches: [ "master" , "second" ]
+env:
+  USER_POSTGRESQL: ${{ secrets.USER_POSTGRESQL }}
+  PASSWORD_POSTGRESQL: ${{ secrets.PASSWORD_POSTGRESQL }}
+  EMAIL_USER: ${{ secrets.EMAIL_USER }}
+  EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+  ARVAN_ACCESS_KEY: ${{ secrets.ARVAN_ACCESS_KEY }}
+  ARVAN_SECRET_KEY: ${{ secrets.ARVAN_SECRET_KEY }}
+  ARVAN_BUCKET_NAME: ${{ secrets.ARVAN_BUCKET_NAME }}
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Create and Start Containers  
+      run: docker compose up -d --build
+    - name: Run Tests 
+      run: docker compose exec backend sh -c "python manage.py test"

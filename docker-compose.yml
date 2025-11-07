@@ -17,10 +17,9 @@ services:
       ARVAN_ACCESS_KEY: ${ARVAN_ACCESS_KEY}
       ARVAN_SECRET_KEY: ${ARVAN_SECRET_KEY}
       ARVAN_BUCKET_NAME: ${ARVAN_BUCKET_NAME}
-
-
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - main
   db:
@@ -35,6 +34,11 @@ services:
       - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${USER_POSTGRESQL} -d social_media"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
     networks:
       - main
   rabbitmq: 
